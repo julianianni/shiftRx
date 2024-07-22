@@ -7,12 +7,15 @@
 Add your db configuration into your .env file
 
 1. open psql and run the following commands to create the db
-   CREATE USER auction_user WITH ENCRYPTED PASSWORD 'your_password';
+
+   ````CREATE USER auction_user WITH ENCRYPTED PASSWORD 'your_password';
    CREATE DATABASE auction_db;
-   GRANT ALL PRIVILEGES ON DATABASE auction_db TO auction_user;
+   GRANT ALL PRIVILEGES ON DATABASE auction_db TO auction_user;```
+
+   ````
 
 2. generate a random jwt token with this cli
-   `head -c 32 /dev/urandom | base64` and paste it on your .env file
+   `head -c 32 /dev/urandom | base64` and paste it on your .env file under the `JWT_SECRET` key
 
 ## Installation
 

@@ -10,7 +10,7 @@ describe('UserController (e2e)', () => {
 
   it('/POST users/register', () => {
     return request(testEnv.app.getHttpServer())
-      .post('/users/register')
+      .post('/users/sign-up')
       .send({ email: 'test@example.com', password: 'password' })
       .expect(201);
   });
