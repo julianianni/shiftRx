@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
+
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
 
 export async function createE2ETestEnvironment() {
   const module: TestingModule = await Test.createTestingModule({
@@ -13,10 +14,10 @@ export async function createE2ETestEnvironment() {
         signOptions: { expiresIn: '1h' }, // Set the expiration time as per your requirements
       }),
     ],
-    controllers: [UserController],
+    controllers: [AuthController],
     providers: [
       {
-        provide: UserService,
+        provide: AuthService,
         useValue: {
           createUser: jest.fn(),
           login: jest.fn(),
@@ -35,13 +36,12 @@ export async function createE2ETestEnvironment() {
     app,
     module,
     async createUser() {
-      const userService = module.get<UserService>(UserService);
+      const authService = module.get<AuthService>(AuthService);
       const user = {
-        name: 'John Doe',
         email: 'john.doe@example.com',
         password: 'password123',
       };
-      return userService.createUser(user);
+      return authService.signUp(user.email, user.password);
     },
   };
 }

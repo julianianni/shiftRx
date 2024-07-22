@@ -3,7 +3,6 @@ import { AuctionController } from './auction.controller';
 import { AuctionService } from './auction.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
-import { UserService } from '../user/user.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
@@ -28,7 +27,6 @@ describe('AuctionController', () => {
         AuctionService,
         PrismaService,
         AuthService,
-        UserService,
         {
           provide: JwtAuthGuard,
           useValue: jest.fn().mockImplementation(() => true),

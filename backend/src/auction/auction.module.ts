@@ -4,9 +4,7 @@ import { AuctionController } from './auction.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [
-    PrismaModule, // Assuming PrismaService is exported from PrismaModule
-  ],
+  imports: [PrismaModule],
   providers: [AuctionService],
   controllers: [AuctionController],
 })

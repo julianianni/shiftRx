@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { AuthService } from './auth.service';
 
-describe('UserService', () => {
-  let service: UserService;
+describe('AuthService', () => {
+  let service: AuthService;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserService,
+        AuthService,
         {
           provide: PrismaService,
           useValue: {
@@ -23,7 +23,7 @@ describe('UserService', () => {
       ],
     }).compile();
 
-    service = module.get<UserService>(UserService);
+    service = module.get<AuthService>(AuthService);
     prisma = module.get<PrismaService>(PrismaService);
   });
 
@@ -43,7 +43,10 @@ describe('UserService', () => {
         password: hashedPassword,
       } as any);
 
-      const user = await service.createUser(createUserDto);
+      const user = await service.signUp(
+        createUserDto.email,
+        createUserDto.password,
+      );
 
       expect(user).toHaveProperty('id');
       expect(user.email).toBe(createUserDto.email);
