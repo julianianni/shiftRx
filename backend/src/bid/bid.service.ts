@@ -57,4 +57,14 @@ export class BidService {
 
     return bids.map((bid) => new BidDto(bid));
   }
+
+  async findMyBids(userId: number) {
+    const bids = await this.prisma.bid.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { auction: true },
+    });
+
+    return bids.map((bid) => new BidDto(bid));
+  }
 }

@@ -36,6 +36,8 @@ export interface BidDto {
   createdAt: string;
   amount: number;
   user: UserDto;
+  auctionTitle?: string;
+  auctionId?: number;
 }
 
 export interface AuctionDto {
@@ -50,6 +52,11 @@ export interface AuctionDto {
   currentPrice: number;
   /** @format date-time */
   endTime: string;
+  bids: BidDto[];
+}
+
+export interface AuctionWithBids {
+  auctions: AuctionDto[];
   bids: BidDto[];
 }
 
@@ -357,7 +364,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/auctions/my-auctions
      */
     auctionControllerGetMyAuctionsWithBids: (params: RequestParams = {}) =>
-      this.request<AuctionDto[], any>({
+      this.request<AuctionWithBids, any>({
         path: `/api/auctions/my-auctions`,
         method: "GET",
         format: "json",

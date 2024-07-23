@@ -17,6 +17,7 @@ import { User } from '../user/user.decorator';
 import { AuctionService } from './auction.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { AuctionDto } from './dto/auction.dto';
+import { AuctionWithBids } from './dto/auctionWIthBids.dto';
 
 @Controller('auctions')
 export class AuctionController {
@@ -52,9 +53,9 @@ export class AuctionController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get my auctions with bids',
-    type: [AuctionDto],
+    type: AuctionWithBids,
   })
-  async getMyAuctionsWithBids(@User() user): Promise<AuctionDto[]> {
+  async getMyAuctionsWithBids(@User() user): Promise<AuctionWithBids> {
     return this.auctionService.getMyActionsWithBids(user.id);
   }
 

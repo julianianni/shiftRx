@@ -1,17 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useAuth } from '../auth/AuthContext'
-import { AuctionDto, BidDto } from '@/types/api/Api'
 import { useGetMyAuctions } from '@/api/api-hooks/useGetMyAuctions'
 import Link from 'next/link'
 
 export const DashboardListPage = () => {
   const { isError, isLoading, data } = useGetMyAuctions()
 
+  console.log(data)
+
   if (isLoading) return <p>Loading...</p>
   if (isError) return <p>Oops! there was an error getting your acutions...</p>
-  if (!data?.length) return <p>You have not auctions</p>
+
+  const auctions = data?.auctions || []
+  const bids = data?.bids || []
 
   return (
     <div className='container mx-auto p-4'>
@@ -19,50 +20,56 @@ export const DashboardListPage = () => {
       <h2 className='text-2xl font-semibold mb-2'>Your Auctions</h2>
 
       <ul className='list-disc ml-5'>
-        {data.map((auction) => (
-          <li key={auction.id} className='mb-2'>
-            <Link
-              href={`/auctions/${auction.id}`}
-              className='text-blue-500 underline'
-            >
-              Title: {auction.title}
-            </Link>
-            <div>
-              <h2 className='text-black font-semibold'>Bids </h2>
-              {auction.bids.length ? (
-                auction.bids?.map((bid) => {
-                  return (
-                    <div key={bid.id} className='flex gap-2'>
-                      <p>Amount:${bid.amount}</p>
-                      <p>by user {bid.user.email}</p>
-                    </div>
-                  )
-                })
-              ) : (
-                <p className='italic'>No bids on this auction</p>
-              )}
-            </div>
-          </li>
-        ))}
+        {!!auctions.length ? (
+          auctions.map((auction) => (
+            <li key={auction.id} className='mb-2'>
+              <Link
+                href={`/auctions/${auction.id}`}
+                className='text-blue-500 underline'
+              >
+                Title: {auction.title}
+              </Link>
+              <div>
+                <h2 className='text-black font-semibold'>Bids </h2>
+                {auction.bids.length ? (
+                  auction.bids?.map((bid) => {
+                    return (
+                      <div key={bid.id} className='flex gap-2'>
+                        <p>Amount:${bid.amount}</p>
+                        <p>by user {bid.user.email}</p>
+                      </div>
+                    )
+                  })
+                ) : (
+                  <p className='italic'>No bids on this auction</p>
+                )}
+              </div>
+            </li>
+          ))
+        ) : (
+          <p>No auctions</p>
+        )}
       </ul>
 
       <h2 className='text-2xl font-semibold mt-6 mb-2'>Your Bids</h2>
-      {/* {bids.length > 0 ? (
+      {!!bids.length ? (
         <ul className='list-disc ml-5'>
           {bids.map((bid) => (
-            <li key={bid.id} className='mb-2'>
-              <a
-                href={`/auction/${bid.auctionId}`}
+            <li key={bid.id} className='mb-2 flex'>
+              Bid of ${bid.amount} on auction:{'  '}
+              <Link
+                href={`/auctions/${bid.auctionId}`}
                 className='text-blue-500 underline'
               >
-                Bid of ${bid.amount} on auction ID {bid.auctionId}
-              </a>
+                {' '}
+                {bid.auctionTitle}
+              </Link>
             </li>
           ))}
         </ul>
       ) : (
         <p>No bids found.</p>
-      )} */}
+      )}
     </div>
   )
 }

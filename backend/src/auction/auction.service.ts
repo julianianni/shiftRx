@@ -7,6 +7,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { AuctionDto } from './dto/auction.dto';
+import { BidDto } from '../bid/dto/bid.dto';
+import { AuctionWithBids } from './dto/auctionWIthBids.dto';
 
 @Injectable()
 export class AuctionService {
@@ -89,6 +91,17 @@ export class AuctionService {
       include: { bids: { include: { user: true } } },
     });
 
-    return auctions.map((auc) => new AuctionDto(auc, auc.bids));
+    const myBids = await this.prisma.bid.findMany({
+      where: { userId },
+      include: {
+        auction: { include: { bids: { include: { user: true } } } },
+      },
+    });
+
+    const auctionsDtos = auctions.map((auc) => new AuctionDto(auc, auc.bids));
+
+    const bidDtos = myBids.map((bid) => new BidDto(bid));
+
+    return new AuctionWithBids(auctionsDtos, bidDtos);
   }
 }
