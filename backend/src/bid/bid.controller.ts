@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { BidService } from './bid.service';
 import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
+import { PlaceBidDto } from './dto/place-bid.dto';
 
 @Controller('auctions/:id/bid')
 export class BidController {
@@ -18,15 +19,19 @@ export class BidController {
   @Post()
   async placeBid(
     @Param('id') auctionId: number,
-    @Body('amount') amount: number,
+    @Body() placeBidDto: PlaceBidDto,
     @Request() req,
   ) {
     const userId = req.user.id;
-    return this.bidService.placeBid(Number(auctionId), userId, Number(amount));
+    return this.bidService.placeBid(
+      Number(auctionId),
+      userId,
+      Number(placeBidDto.amount),
+    );
   }
 
   @Get()
   async getBids(@Param('id') auctionId: number) {
-    return this.bidService.getBids(Number(auctionId));
+    return this.bidService.findBidsByAuctionId(Number(auctionId));
   }
 }

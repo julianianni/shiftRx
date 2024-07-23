@@ -9,13 +9,14 @@ export class AuctionService {
   constructor(private prisma: PrismaService) {}
 
   async createAuction(createAuctionDto: CreateAuctionDto, userId: number) {
-    const { title, description, startingPrice, endTime } = createAuctionDto;
+    const { title, description, startingPrice, currentPrice, endTime } =
+      createAuctionDto;
     return this.prisma.auction.create({
       data: {
         title,
         description,
         startingPrice,
-        currentPrice: startingPrice,
+        currentPrice,
         // Automatic 7 days from now
         endTime: endTime || new Date(Date.now() + 1000 * 7 * 60 * 60 * 24),
         userId,

@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BidGateway } from './bid.gateway';
 
 @Injectable()
 export class BidService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private bidsGateway: BidGateway,
+  ) {}
 
   async placeBid(auctionId: number, userId: number, amount: number) {
     const auction = await this.prisma.auction.findUnique({
@@ -31,10 +35,12 @@ export class BidService {
       data: { currentPrice: amount },
     });
 
+    await this.bidsGateway.broadcastNewBid(String(bid.auctionId), bid);
+
     return bid;
   }
 
-  async getBids(auctionId: number) {
+  async findBidsByAuctionId(auctionId: number) {
     return this.prisma.bid.findMany({
       where: { auctionId },
       orderBy: { createdAt: 'desc' },

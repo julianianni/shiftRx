@@ -13,4 +13,8 @@ export class CreateAuctionDto {
   @IsOptional()
   @IsDateString()
   readonly endTime?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  readonly currentPrice?: number;
 }

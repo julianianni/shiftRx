@@ -1,8 +1,11 @@
 'use client'
 
 import { AuctionDto } from '@/types/api/Api'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
+import { socket } from '../../infrastructure/socket'
+
+import { useMutationPlaceBid } from '@/api/api-hooks/useMutationPlaceBid'
 
 interface CreateBidFormProps {
   auction: AuctionDto
@@ -13,6 +16,20 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
   const [bidAmount, setBidAmount] = useState('')
   const [error, setError] = useState('')
   const { user } = useAuth()
+  const { mutateAsync } = useMutationPlaceBid()
+
+  useEffect(() => {
+    socket.emit('joinAuction', auction.id)
+
+    socket.on('newBid', (bid) => {
+      // TODO - update bids
+    })
+
+    return () => {
+      socket.off('connect')
+      socket.off('disconnect')
+    }
+  }, [auction.id])
 
   const handleBidSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -24,13 +41,7 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
     }
 
     try {
-      // await axios.post(`/api/auctions/${id}/bid`, {
-      //   amount: bidAmount,
-      // }, {
-      //   headers: {
-      //     Authorization: `Bearer ${user.token}`,
-      //   },
-      // });
+      mutateAsync({ amount: Number(bidAmount), id: auction.id })
 
       setBidAmount('')
       // const response = await axios.get(`/api/auctions/${id}/bids`);
@@ -57,7 +68,7 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
               type='number'
               value={bidAmount}
               onChange={(e) => setBidAmount(e.target.value)}
-              className='border p-2 rounded mb-2 w-full'
+              className='border p-2 rounded mb-2 w-full text-black'
               placeholder='Enter your bid amount'
             />
             <button
@@ -72,8 +83,9 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
           <h2 className='text-2xl font-bold mb-2'>Bids</h2>
           {/* <ul>
             {bids.map((bid) => (
-              <li key={bid.id} className="mb-2">
-                ${bid.amount} by User {bid.userId} at {new Date(bid.createdAt).toLocaleString()}
+              <li key={bid.id} className='mb-2'>
+                ${bid.amount} by User {bid.userId} at{' '}
+                {new Date(bid.createdAt).toLocaleString()}
               </li>
             ))}
           </ul> */}

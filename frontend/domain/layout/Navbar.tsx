@@ -16,22 +16,16 @@ const Navbar = () => {
           {user ? (
             <>
               <span className='text-white mr-4'>Hello, {user.email}</span>
-              <button onClick={logout} className='py-2 px-4 rounded'>
+              <button onClick={logout} className='py-2 px-4 rounded text-white'>
                 Logout
               </button>
             </>
           ) : (
             <div className='flex gap-2 items-center'>
-              <Link
-                href='/login'
-                className=' text-blue-500 py-2 px-4 rounded mr-2'
-              >
+              <Link href='/login' className='  py-2 px-4 rounded mr-2'>
                 Login
               </Link>
-              <Link
-                href='/register'
-                className=' text-blue-500 py-2 px-4 rounded'
-              >
+              <Link href='/register' className='py-2 px-4 rounded'>
                 Register
               </Link>
             </div>

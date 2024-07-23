@@ -38,13 +38,14 @@ export interface AuctionDto {
   updatedAt: string;
   title: string;
   description: string;
-  startingPrice: number;
   currentPrice: number;
   /** @format date-time */
   endTime: string;
 }
 
 export type UpdateAuctionDto = object;
+
+export type PlaceBidDto = object;
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -344,7 +345,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name AuctionControllerGetAuction
      * @request GET:/api/auctions/{id}
      */
-    auctionControllerGetAuction: (id: number, params: RequestParams = {}) =>
+    auctionControllerGetAuction: (id: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/auctions/${id}`,
         method: "GET",
@@ -385,10 +386,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name BidControllerPlaceBid
      * @request POST:/api/auctions/{id}/bid
      */
-    bidControllerPlaceBid: (id: number, params: RequestParams = {}) =>
+    bidControllerPlaceBid: (id: number, data: PlaceBidDto, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/auctions/${id}/bid`,
         method: "POST",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 
