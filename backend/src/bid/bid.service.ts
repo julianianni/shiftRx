@@ -22,6 +22,9 @@ export class BidService {
     if (amount <= auction.currentPrice) {
       throw new Error('Bid amount must be higher than the current price');
     }
+    if (Date.now() > auction.endTime.getTime()) {
+      throw new Error('Bid has already expired');
+    }
 
     if (auction.userId === userId) {
       throw new ConflictException('You cannot bid on your own auction');

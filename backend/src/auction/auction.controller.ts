@@ -46,6 +46,18 @@ export class AuctionController {
     return this.auctionService.getAuctions();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/my-auctions')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get my auctions with bids',
+    type: [AuctionDto],
+  })
+  async getMyAuctionsWithBids(@User() user): Promise<AuctionDto[]> {
+    return this.auctionService.getMyActionsWithBids(user.id);
+  }
+
   @Get(':id')
   async getAuction(@Param('id') id: string) {
     return this.auctionService.getAuction(Number(id));

@@ -1,7 +1,9 @@
 import { IsString, IsNumber, IsDateString } from 'class-validator';
 import { AbstractDto } from '../../shared/AbstractDto';
-import { Auction } from '@prisma/client';
+import { Auction, Bid } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { BidDto } from '../../bid/dto/bid.dto';
 
 export class AuctionDto extends AbstractDto {
   @ApiProperty()
@@ -24,7 +26,11 @@ export class AuctionDto extends AbstractDto {
   @IsDateString()
   endTime: Date;
 
-  constructor(auction: Auction) {
+  @Type(() => BidDto)
+  @ApiProperty({ type: [BidDto] })
+  bids: BidDto[];
+
+  constructor(auction: Auction, bids?: Bid[]) {
     super(auction);
 
     this.title = auction.title;
@@ -32,5 +38,9 @@ export class AuctionDto extends AbstractDto {
     this.currentPrice = auction.currentPrice;
     this.endTime = auction.endTime;
     this.userId = auction.userId;
+
+    if (bids) {
+      this.bids = bids.map((bid) => new BidDto(bid));
+    }
   }
 }

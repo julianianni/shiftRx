@@ -37,7 +37,7 @@ export class AuctionService {
   async getAuctions() {
     const auctionsEntity = await this.prisma.auction.findMany({
       where: { endTime: { gte: new Date() } },
-      orderBy: { endTime: 'asc' },
+      orderBy: { createdAt: 'asc' },
     });
 
     return auctionsEntity.map((auc) => new AuctionDto(auc));
@@ -81,5 +81,14 @@ export class AuctionService {
     return this.prisma.auction.delete({
       where: { id },
     });
+  }
+
+  async getMyActionsWithBids(userId: number) {
+    const auctions = await this.prisma.auction.findMany({
+      where: { userId },
+      include: { bids: { include: { user: true } } },
+    });
+
+    return auctions.map((auc) => new AuctionDto(auc, auc.bids));
   }
 }

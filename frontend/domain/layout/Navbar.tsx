@@ -17,6 +17,12 @@ const Navbar = () => {
             <>
               <span className='text-white mr-4'>Hello, {user.email}</span>
               <Link
+                href={`/dashboard`}
+                className='text-white py-2 px-4 rounded mr-2'
+              >
+                Dashboard
+              </Link>
+              <Link
                 href='/create-auction'
                 className='text-white py-2 px-4 rounded mr-2'
               >

@@ -15,10 +15,12 @@ export class BidDto extends NonUpdatedAbstractDto {
   @IsNumber()
   readonly user: UserDto;
 
-  constructor(bid: Bid & { user: User }) {
+  constructor(bid: Bid & { user?: User }) {
     super(bid);
 
-    this.user = new UserDto(bid.user);
+    if (bid.user) {
+      this.user = new UserDto(bid.user);
+    }
 
     this.amount = bid.amount;
   }

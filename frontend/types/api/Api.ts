@@ -30,6 +30,14 @@ export interface LoginPayloadDto {
 
 export type CreateAuctionDto = object;
 
+export interface BidDto {
+  id: number;
+  /** @format date-time */
+  createdAt: string;
+  amount: number;
+  user: UserDto;
+}
+
 export interface AuctionDto {
   id: number;
   /** @format date-time */
@@ -42,19 +50,12 @@ export interface AuctionDto {
   currentPrice: number;
   /** @format date-time */
   endTime: string;
+  bids: BidDto[];
 }
 
 export type UpdateAuctionDto = object;
 
 export type PlaceBidDto = object;
-
-export interface BidDto {
-  id: number;
-  /** @format date-time */
-  createdAt: string;
-  amount: number;
-  user: UserDto;
-}
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -344,6 +345,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     auctionControllerGetAuctions: (params: RequestParams = {}) =>
       this.request<AuctionDto[], any>({
         path: `/api/auctions`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name AuctionControllerGetMyAuctionsWithBids
+     * @request GET:/api/auctions/my-auctions
+     */
+    auctionControllerGetMyAuctionsWithBids: (params: RequestParams = {}) =>
+      this.request<AuctionDto[], any>({
+        path: `/api/auctions/my-auctions`,
         method: "GET",
         format: "json",
         ...params,

@@ -47,7 +47,7 @@ async function main() {
         description: 'A classic vintage watch from the 70s.',
         startingPrice: 200,
         currentPrice: 200,
-        endTime: new Date(Date.now() + 48 * 60 * 60 * 1000), // 2 days from now
+        endTime: new Date(Date.now() - 48 * 60 * 60 * 1000), // 2 days ago
         userId: allUsers[1].id,
       },
       {

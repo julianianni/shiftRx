@@ -1,7 +1,10 @@
+'use client'
+
 import { AuctionDto } from '@/types/api/Api'
 import { formatDateToDDMMYYYYY } from '@/utils/date.utils'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useAuth } from '../auth/AuthContext'
 
 interface AuctionCardProps {
   auction: AuctionDto
@@ -9,6 +12,9 @@ interface AuctionCardProps {
 }
 
 export const AuctionCard = ({ auction, view = 'grid' }: AuctionCardProps) => {
+  const { user } = useAuth()
+  const isOwner = user && auction.userId === user.id
+  const hasExpired = new Date(auction.endTime) < new Date()
   return (
     <div className='min-w-12 min-h-6 rounded-lg bg-blue-400 text-blue p-4 font-extralight'>
       <div className='flex flex-col gap-2'>
@@ -45,6 +51,16 @@ export const AuctionCard = ({ auction, view = 'grid' }: AuctionCardProps) => {
           >
             See more details
           </Link>
+        )}
+        {isOwner && (
+          <p className='text-green-500 bg-green-100 rounded-lg p-2'>
+            You are the owner of this auction
+          </p>
+        )}
+        {hasExpired && (
+          <p className='text-red-500 bg-red-100 rounded-lg p-2'>
+            This auction has expired
+          </p>
         )}
       </div>
     </div>
