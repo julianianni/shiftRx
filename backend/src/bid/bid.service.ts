@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BidGateway } from './bid.gateway';
+import { BidDto } from './dto/bid.dto';
 
 @Injectable()
 export class BidService {
@@ -41,9 +42,12 @@ export class BidService {
   }
 
   async findBidsByAuctionId(auctionId: number) {
-    return this.prisma.bid.findMany({
+    const bids = await this.prisma.bid.findMany({
       where: { auctionId },
       orderBy: { createdAt: 'desc' },
+      include: { user: true },
     });
+
+    return bids.map((bid) => new BidDto(bid));
   }
 }

@@ -12,3 +12,11 @@ export abstract class AbstractEntity {
   @ApiProperty()
   updatedAt: Date;
 }
+
+export abstract class NonUpdatedAbstractEntity {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  createdAt: Date;
+}

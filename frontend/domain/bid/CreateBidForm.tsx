@@ -1,18 +1,26 @@
 'use client'
 
-import { AuctionDto } from '@/types/api/Api'
+import { AuctionDto, BidDto } from '@/types/api/Api'
 import { FormEvent, useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { socket } from '../../infrastructure/socket'
+import Image from 'next/image'
 
 import { useMutationPlaceBid } from '@/api/api-hooks/useMutationPlaceBid'
+import clearCachesByServerAction from '@/infrastructure/revalidatePath'
+import { useResettableState } from '../useResetTableState'
 
 interface CreateBidFormProps {
   auction: AuctionDto
+  bids: BidDto[]
 }
 
-export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
-  const [bids, setBids] = useState([])
+export const CreateBidForm = ({
+  auction,
+  bids: externalBids,
+}: CreateBidFormProps) => {
+  const [bids, setBids] = useResettableState<BidDto[]>(externalBids || [])
+
   const [bidAmount, setBidAmount] = useState('')
   const [error, setError] = useState('')
   const { user } = useAuth()
@@ -22,14 +30,14 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
     socket.emit('joinAuction', auction.id)
 
     socket.on('newBid', (bid) => {
-      // TODO - update bids
+      setBids((prevBids) => [...prevBids, bid])
     })
 
     return () => {
       socket.off('connect')
       socket.off('disconnect')
     }
-  }, [auction.id])
+  }, [auction.id, setBids])
 
   const handleBidSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -44,10 +52,10 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
       mutateAsync({ amount: Number(bidAmount), id: auction.id })
 
       setBidAmount('')
-      // const response = await axios.get(`/api/auctions/${id}/bids`);
-      // setBids(response.data);
     } catch (err) {
       setError('Failed to place a bid. Please try again.')
+    } finally {
+      clearCachesByServerAction('/auctions/[id]')
     }
   }
 
@@ -55,14 +63,28 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
     <div className='container mx-auto p-4'>
       {auction ? (
         <>
-          <h1 className='text-3xl font-bold mb-4'>{auction.title}</h1>
-          <p className='mb-4'>{auction.description}</p>
-          <p className='mb-4'>Current Price: ${auction.currentPrice}</p>
-          <p className='mb-4'>
-            Ends at: {new Date(auction.endTime).toLocaleString()}
-          </p>
+          <div className='flex gap-10'>
+            <Image
+              src={`https://picsum.photos/300/300`}
+              alt='img_auction'
+              width={200}
+              height={200}
+              className='h-[200px] w-[200px] rounded-lg'
+            />
 
-          <h2 className='text-2xl font-bold mb-2'>Place a Bid</h2>
+            <div className='flex flex-col gap-2'>
+              <h1 className='text-3xl font-bold mb-4'>
+                Title: {auction.title}
+              </h1>
+              <p className='mb-4'>Description: {auction.description}</p>
+              <p className='mb-4'>Current Price: ${auction.currentPrice}</p>
+              <p className='mb-4'>
+                Ends at: {new Date(auction.endTime).toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          <h2 className='text-2xl font-bold mb-2 mt-4'>Place a Bid</h2>
           <form onSubmit={handleBidSubmit} className='mb-4'>
             <input
               type='number'
@@ -70,6 +92,7 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
               onChange={(e) => setBidAmount(e.target.value)}
               className='border p-2 rounded mb-2 w-full text-black'
               placeholder='Enter your bid amount'
+              min={auction.currentPrice + 1}
             />
             <button
               type='submit'
@@ -80,15 +103,22 @@ export const CreateBidForm = ({ auction }: CreateBidFormProps) => {
           </form>
           {error && <p className='text-red-500'>{error}</p>}
 
-          <h2 className='text-2xl font-bold mb-2'>Bids</h2>
-          {/* <ul>
-            {bids.map((bid) => (
-              <li key={bid.id} className='mb-2'>
-                ${bid.amount} by User {bid.userId} at{' '}
-                {new Date(bid.createdAt).toLocaleString()}
-              </li>
-            ))}
-          </ul> */}
+          <h2 className='text-2xl font-bold mb-2'>Previous Bids</h2>
+          <ul>
+            {!!bids.length ? (
+              bids.map((bid) => (
+                <li key={bid.id} className='mb-2'>
+                  {bid.user.email === user.email
+                    ? 'You '
+                    : `User: ${bid.user.email}`}{' '}
+                  made a bid of ${bid.amount} on{' '}
+                  {new Date(bid.createdAt).toLocaleString()}
+                </li>
+              ))
+            ) : (
+              <p>No bids yet</p>
+            )}
+          </ul>
         </>
       ) : (
         <p>Loading...</p>

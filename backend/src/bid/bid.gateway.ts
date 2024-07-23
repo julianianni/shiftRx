@@ -18,9 +18,9 @@ export class BidGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {}
+  handleConnection() {}
 
-  handleDisconnect(client: Socket) {}
+  handleDisconnect() {}
 
   @SubscribeMessage('joinAuction')
   async handleJoinAuction(client: Socket, auctionId: string) {

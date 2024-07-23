@@ -6,10 +6,14 @@ import {
   Body,
   UseGuards,
   Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { BidService } from './bid.service';
 import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
 import { PlaceBidDto } from './dto/place-bid.dto';
+import { ApiResponse } from '@nestjs/swagger';
+import { BidDto } from './dto/bid.dto';
 
 @Controller('auctions/:id/bid')
 export class BidController {
@@ -31,7 +35,13 @@ export class BidController {
   }
 
   @Get()
-  async getBids(@Param('id') auctionId: number) {
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get Bids by Auction Id',
+    type: [BidDto],
+  })
+  async getBids(@Param('id') auctionId: number): Promise<BidDto[]> {
     return this.bidService.findBidsByAuctionId(Number(auctionId));
   }
 }

@@ -47,6 +47,14 @@ export type UpdateAuctionDto = object;
 
 export type PlaceBidDto = object;
 
+export interface BidDto {
+  id: number;
+  /** @format date-time */
+  createdAt: string;
+  amount: number;
+  user: UserDto;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -402,9 +410,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/auctions/{id}/bid
      */
     bidControllerGetBids: (id: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<BidDto[], any>({
         path: `/api/auctions/${id}/bid`,
         method: "GET",
+        format: "json",
         ...params,
       }),
   };
