@@ -17,6 +17,8 @@ Add your db configuration into your .env file
 2. generate a random jwt token with this cli
    `head -c 32 /dev/urandom | base64` and paste it on your .env file under the `JWT_SECRET` key
 
+3. Seed with dummy data if wanted `npm run seed`
+
 ## Installation
 
 ```bash
