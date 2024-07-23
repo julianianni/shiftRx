@@ -37,6 +37,7 @@ export interface AuctionDto {
   /** @format date-time */
   updatedAt: string;
   title: string;
+  userId: number;
   description: string;
   currentPrice: number;
   /** @format date-time */
@@ -325,11 +326,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/auctions
      */
     auctionControllerCreateAuction: (data: CreateAuctionDto, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<AuctionDto, any>({
         path: `/api/auctions`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 

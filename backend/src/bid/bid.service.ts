@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BidGateway } from './bid.gateway';
 import { BidDto } from './dto/bid.dto';
@@ -21,6 +21,10 @@ export class BidService {
 
     if (amount <= auction.currentPrice) {
       throw new Error('Bid amount must be higher than the current price');
+    }
+
+    if (auction.userId === userId) {
+      throw new ConflictException('You cannot bid on your own auction');
     }
 
     const bid = await this.prisma.bid.create({

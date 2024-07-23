@@ -24,4 +24,10 @@ function getApiInstance(authCookie?: string): Api<unknown> {
   return api
 }
 
-export { getApiInstance }
+const getAuthHeader = () => {
+  return {
+    headers: { authorization: 'Bearer ' + localStorage.getItem('token') },
+  }
+}
+
+export { getApiInstance, getAuthHeader }

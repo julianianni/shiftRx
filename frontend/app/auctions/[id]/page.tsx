@@ -10,8 +10,6 @@ export default async function Auction(data: { params: { id: string } }) {
   const auction = await getAuction(Number(id))
   const bids = await getBidsByAuction(auction.id)
 
-  console.log(auction, bids.length)
-
   if (!auction) {
     throw new Error('Auction not found')
   }

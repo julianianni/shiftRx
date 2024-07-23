@@ -5,10 +5,12 @@ import { FormEvent, useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { socket } from '../../infrastructure/socket'
 import Image from 'next/image'
+import toast from 'react-hot-toast'
 
 import { useMutationPlaceBid } from '@/api/api-hooks/useMutationPlaceBid'
 import clearCachesByServerAction from '@/infrastructure/revalidatePath'
 import { useResettableState } from '../useResetTableState'
+import Link from 'next/link'
 
 interface CreateBidFormProps {
   auction: AuctionDto
@@ -25,6 +27,7 @@ export const CreateBidForm = ({
   const [error, setError] = useState('')
   const { user } = useAuth()
   const { mutateAsync } = useMutationPlaceBid()
+  const isOwner = user.id === auction.userId
 
   useEffect(() => {
     socket.emit('joinAuction', auction.id)
@@ -52,6 +55,7 @@ export const CreateBidForm = ({
       mutateAsync({ amount: Number(bidAmount), id: auction.id })
 
       setBidAmount('')
+      toast.success('You have place a new bid!')
     } catch (err) {
       setError('Failed to place a bid. Please try again.')
     } finally {
@@ -73,9 +77,20 @@ export const CreateBidForm = ({
             />
 
             <div className='flex flex-col gap-2'>
-              <h1 className='text-3xl font-bold mb-4'>
-                Title: {auction.title}
-              </h1>
+              <div className='flex gap-2'>
+                {' '}
+                <h1 className='text-3xl font-bold mb-4'>
+                  Title: {auction.title}
+                </h1>
+                {isOwner && (
+                  <Link
+                    href={`/edit-auction/${auction.id}`}
+                    className='bg-blue-400 rounded-lg flex items-center jusfify-center px-2 py-1 text-white'
+                  >
+                    Edit your auction
+                  </Link>
+                )}
+              </div>
               <p className='mb-4'>Description: {auction.description}</p>
               <p className='mb-4'>Current Price: ${auction.currentPrice}</p>
               <p className='mb-4'>
@@ -93,13 +108,22 @@ export const CreateBidForm = ({
               className='border p-2 rounded mb-2 w-full text-black'
               placeholder='Enter your bid amount'
               min={auction.currentPrice + 1}
+              disabled={isOwner}
             />
-            <button
-              type='submit'
-              className='bg-blue-500 text-white py-2 px-4 rounded'
-            >
-              Place Bid
-            </button>
+            <div className='flex gap-4 items-center'>
+              <button
+                type='submit'
+                className='bg-blue-500 text-white py-2 px-4 rounded'
+                disabled={isOwner}
+              >
+                Place Bid
+              </button>
+              {isOwner && (
+                <p className='text-red-500'>
+                  You are the owner of this auction and can not make bids
+                </p>
+              )}
+            </div>
           </form>
           {error && <p className='text-red-500'>{error}</p>}
 

@@ -9,6 +9,10 @@ export class AuctionDto extends AbstractDto {
   title: string;
 
   @ApiProperty()
+  @IsNumber()
+  userId: number;
+
+  @ApiProperty()
   @IsString()
   description: string;
 
@@ -27,5 +31,6 @@ export class AuctionDto extends AbstractDto {
     this.description = auction.description;
     this.currentPrice = auction.currentPrice;
     this.endTime = auction.endTime;
+    this.userId = auction.userId;
   }
 }

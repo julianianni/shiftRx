@@ -24,10 +24,15 @@ export class AuctionController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Creates an auction and return the auctionDto created',
+    type: AuctionDto,
+  })
   async createAuction(
     @Body() createAuctionDto: CreateAuctionDto,
     @User() user,
-  ) {
+  ): Promise<AuctionDto> {
     return this.auctionService.createAuction(createAuctionDto, user.id);
   }
   @Get()
@@ -51,8 +56,9 @@ export class AuctionController {
   async updateAuction(
     @Param('id') id: number,
     @Body() updateAuctionDto: UpdateAuctionDto,
+    @User() user,
   ) {
-    return this.auctionService.updateAuction(id, updateAuctionDto);
+    return this.auctionService.updateAuction(id, updateAuctionDto, user.id);
   }
 
   @UseGuards(JwtAuthGuard)

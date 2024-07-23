@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
@@ -11,17 +15,23 @@ export class AuctionService {
   async createAuction(createAuctionDto: CreateAuctionDto, userId: number) {
     const { title, description, startingPrice, currentPrice, endTime } =
       createAuctionDto;
-    return this.prisma.auction.create({
+    const createdAuction = await this.prisma.auction.create({
       data: {
         title,
         description,
         startingPrice,
-        currentPrice,
+        currentPrice: currentPrice || startingPrice,
         // Automatic 7 days from now
         endTime: endTime || new Date(Date.now() + 1000 * 7 * 60 * 60 * 24),
         userId,
       },
     });
+
+    const auction = await this.prisma.auction.findUnique({
+      where: { id: createdAuction.id },
+    });
+
+    return new AuctionDto(auction);
   }
 
   async getAuctions() {
@@ -41,9 +51,28 @@ export class AuctionService {
     return new AuctionDto(auctionEntity);
   }
 
-  async updateAuction(id: number, updateAuctionDto: UpdateAuctionDto) {
-    return this.prisma.auction.update({
+  async updateAuction(
+    id: number,
+    updateAuctionDto: UpdateAuctionDto,
+    userId: string,
+  ) {
+    //validate the auction userId is the same as the user id of the request
+    const auction = await this.prisma.auction.findUnique({
       where: { id: Number(id) },
+    });
+
+    if (!auction) {
+      throw new NotFoundException('Could not found action with id: ' + id);
+    }
+
+    if (Number(auction.userId) !== Number(userId)) {
+      throw new UnauthorizedException(
+        'You cannot update an auction that is not yours',
+      );
+    }
+
+    return this.prisma.auction.update({
+      where: { id: Number(auction.id) },
       data: updateAuctionDto,
     });
   }

@@ -7,8 +7,9 @@ export class CreateAuctionDto {
   @IsString()
   readonly description: string;
 
+  @IsOptional()
   @IsNumber()
-  readonly startingPrice: number;
+  readonly startingPrice?: number;
 
   @IsOptional()
   @IsDateString()
