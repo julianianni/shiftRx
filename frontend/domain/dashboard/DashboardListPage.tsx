@@ -6,8 +6,6 @@ import Link from 'next/link'
 export const DashboardListPage = () => {
   const { isError, isLoading, data } = useGetMyAuctions()
 
-  console.log(data)
-
   if (isLoading) return <p>Loading...</p>
   if (isError) return <p>Oops! there was an error getting your acutions...</p>
 

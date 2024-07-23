@@ -8,18 +8,12 @@ describe('AuthController (e2e)', () => {
     testEnv = await createE2ETestEnvironment();
   });
 
-  it('/POST users/register', () => {
-    return request(testEnv.app.getHttpServer())
-      .post('/auth/sign-up')
-      .send({ email: 'test@example.com', password: 'password' })
-      .expect(201);
-  });
-
-  it('/POST users/login', () => {
+  it('/POST auth/login', async () => {
+    await testEnv.createUser();
     return request(testEnv.app.getHttpServer())
       .post('/auth/login')
-      .send({ email: 'test@example.com', password: 'password' })
-      .expect(201);
+      .send({ email: 'john.doe@example.com', password: 'password123' })
+      .expect(200);
   });
 
   afterAll(async () => {
