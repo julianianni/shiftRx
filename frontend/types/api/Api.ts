@@ -9,6 +9,11 @@
  * ---------------------------------------------------------------
  */
 
+export interface UserLoginDto {
+  email: string;
+  password: string;
+}
+
 export interface UserDto {
   id: number;
   /** @format date-time */
@@ -20,9 +25,24 @@ export interface UserDto {
 
 export interface LoginPayloadDto {
   user: UserDto;
+  accessToken: string;
 }
 
 export type CreateAuctionDto = object;
+
+export interface AuctionDto {
+  id: number;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  title: string;
+  description: string;
+  startingPrice: number;
+  currentPrice: number;
+  /** @format date-time */
+  endTime: string;
+}
 
 export type UpdateAuctionDto = object;
 
@@ -249,10 +269,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name AuthControllerSignUp
      * @request POST:/api/auth/sign-up
      */
-    authControllerSignUp: (params: RequestParams = {}) =>
+    authControllerSignUp: (data: UserLoginDto, params: RequestParams = {}) =>
       this.request<UserDto, any>({
         path: `/api/auth/sign-up`,
         method: "POST",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -263,10 +285,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name AuthControllerSignIn
      * @request POST:/api/auth/login
      */
-    authControllerSignIn: (params: RequestParams = {}) =>
+    authControllerSignIn: (data: UserLoginDto, params: RequestParams = {}) =>
       this.request<LoginPayloadDto, any>({
         path: `/api/auth/login`,
         method: "POST",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -278,9 +302,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/auth/profile
      */
     authControllerGetProfile: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<UserDto, any>({
         path: `/api/auth/profile`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -306,9 +331,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/auctions
      */
     auctionControllerGetAuctions: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<AuctionDto[], any>({
         path: `/api/auctions`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 

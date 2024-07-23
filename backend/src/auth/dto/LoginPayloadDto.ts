@@ -7,7 +7,11 @@ export class LoginPayloadDto {
   @ApiProperty({ type: UserDto })
   user: UserDto;
 
-  constructor(user: UserDto) {
+  @ApiProperty()
+  accessToken: string;
+
+  constructor(user: UserDto, accessToken: string) {
     this.user = user;
+    this.accessToken = accessToken;
   }
 }

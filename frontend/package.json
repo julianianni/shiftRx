@@ -10,12 +10,15 @@
     "swagger": "npx swagger-typescript-api -p ../backend/swagger.json -o ./types/api"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.51.11",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "swagger-typescript-api": "^13.0.13"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.51.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

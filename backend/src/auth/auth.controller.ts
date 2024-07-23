@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
 import { ApiOkResponse, ApiResponse } from '@nestjs/swagger';
 import { LoginPayloadDto } from './dto/LoginPayloadDto';
 import { UserDto } from '../user/dto/user.dto';
+import { UserLoginDto } from './dto/userLoginDto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,9 +25,7 @@ export class AuthController {
     type: UserDto,
     description: 'Successfully registered',
   })
-  async signUp(
-    @Body() body: { email: string; password: string },
-  ): Promise<UserDto> {
+  async signUp(@Body() body: UserLoginDto): Promise<UserDto> {
     return this.authService.signUp(body.email, body.password);
   }
 
@@ -34,18 +33,21 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Get contributor details',
+    description: 'Get user details',
     type: LoginPayloadDto,
   })
-  async signIn(
-    @Body() body: { email: string; password: string },
-  ): Promise<LoginPayloadDto> {
+  async signIn(@Body() body: UserLoginDto): Promise<LoginPayloadDto> {
     return this.authService.signIn(body.email, body.password);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async getProfile(@Request() req) {
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get user details',
+    type: UserDto,
+  })
+  async getProfile(@Request() req): Promise<UserDto> {
     return req.user;
   }
 }

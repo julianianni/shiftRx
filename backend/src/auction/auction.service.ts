@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
+import { AuctionDto } from './dto/auction.dto';
 
 @Injectable()
 export class AuctionService {
@@ -23,16 +24,20 @@ export class AuctionService {
   }
 
   async getAuctions() {
-    return this.prisma.auction.findMany({
+    const auctionsEntity = await this.prisma.auction.findMany({
       where: { endTime: { gte: new Date() } },
       orderBy: { endTime: 'asc' },
     });
+
+    return auctionsEntity.map((auc) => new AuctionDto(auc));
   }
 
   async getAuction(id: number) {
-    return this.prisma.auction.findUnique({
+    const auctionEntity = await this.prisma.auction.findUnique({
       where: { id },
     });
+
+    return new AuctionDto(auctionEntity);
   }
 
   async updateAuction(id: number, updateAuctionDto: UpdateAuctionDto) {

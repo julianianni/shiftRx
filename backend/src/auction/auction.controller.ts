@@ -7,12 +7,16 @@ import {
   Put,
   Delete,
   UseGuards,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { CreateAuctionDto } from './dto/create-auction.dto';
 import { UpdateAuctionDto } from './dto/update-auction.dto';
 import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
 import { User } from '../user/user.decorator';
 import { AuctionService } from './auction.service';
+import { ApiResponse } from '@nestjs/swagger';
+import { AuctionDto } from './dto/auction.dto';
 
 @Controller('auctions')
 export class AuctionController {
@@ -26,15 +30,20 @@ export class AuctionController {
   ) {
     return this.auctionService.createAuction(createAuctionDto, user.id);
   }
-
   @Get()
-  async getAuctions() {
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get actions',
+    type: [AuctionDto],
+  })
+  async getAuctions(): Promise<AuctionDto[]> {
     return this.auctionService.getAuctions();
   }
 
   @Get(':id')
-  async getAuction(@Param('id') id: number) {
-    return this.auctionService.getAuction(id);
+  async getAuction(@Param('id') id: string) {
+    return this.auctionService.getAuction(Number(id));
   }
 
   @UseGuards(JwtAuthGuard)
