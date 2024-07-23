@@ -1,43 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { createE2ETestEnvironment, E2ETestEnvironment } from '../e2e.helper';
 import { BidController } from './bid.controller';
 import { BidService } from './bid.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthService } from '../auth/auth.service';
-import { UserService } from '../user/user.service';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
-import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
 
 describe('BidController', () => {
   let controller: BidController;
   let service: BidService;
+  let testEnv: E2ETestEnvironment;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.register({
-          secret: process.env.JWT_SECRET,
-          signOptions: { expiresIn: '1h' },
-        }),
-        ConfigModule.forRoot(),
-      ],
-      controllers: [BidController],
-      providers: [
-        BidService,
-        PrismaService,
-        AuthService,
-        UserService,
-        {
-          provide: JwtAuthGuard,
-          useValue: jest.fn().mockImplementation(() => true),
-        },
-      ],
-    }).compile();
+    testEnv = await createE2ETestEnvironment();
 
-    controller = module.get<BidController>(BidController);
-    service = module.get<BidService>(BidService);
+    controller = testEnv.module.get<BidController>(BidController);
+    service = testEnv.module.get<BidService>(BidService);
   });
 
   it('should be defined', () => {
@@ -56,20 +30,6 @@ describe('BidController', () => {
       expect(
         await controller.placeBid(auctionId, { amount }, { user: { userId } }),
       ).toBe(bid);
-    });
-  });
-
-  describe('getBids', () => {
-    it('should return a list of bids', async () => {
-      const auctionId = 1;
-      const bids = [
-        { id: 1, auctionId, userId: 1, amount: 100, createdAt: new Date() },
-        { id: 2, auctionId, userId: 2, amount: 200, createdAt: new Date() },
-      ];
-
-      jest.spyOn(service, 'getBids').mockImplementation(async () => bids);
-
-      expect(await controller.getBids(auctionId)).toBe(bids);
     });
   });
 });

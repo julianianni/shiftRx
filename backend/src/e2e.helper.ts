@@ -4,6 +4,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
+import { BidController } from './bid/bid.controller';
+import { BidService } from './bid/bid.service';
+import { BidGateway } from './bid/bid.gateway';
+import { PrismaService } from './prisma/prisma.service';
 
 export async function createE2ETestEnvironment() {
   const module: TestingModule = await Test.createTestingModule({
@@ -14,7 +18,7 @@ export async function createE2ETestEnvironment() {
         signOptions: { expiresIn: '1h' }, // Set the expiration time as per your requirements
       }),
     ],
-    controllers: [AuthController],
+    controllers: [AuthController, BidController],
     providers: [
       {
         provide: AuthService,
@@ -26,6 +30,10 @@ export async function createE2ETestEnvironment() {
           deleteUser: jest.fn(),
         },
       },
+      PrismaService,
+      AuthService,
+      BidService,
+      BidGateway,
     ],
   }).compile();
 
